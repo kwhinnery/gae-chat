@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+	<title>Twilio Chat</title>
+	
+	<!-- JS dependencies - jQuery is not required, but included to make DOM manipulation and Ajax easier -->
+	<script type="text/javascript" src="/_ah/channel/jsapi"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	
+	<!-- A bit of style -->
+	<link rel="stylesheet" href="/style.css" type="text/css" media="screen" title="no title" charset="utf-8"/>
+	
+	<!-- Just going to inline our app logic - that's cool with you, right? -->
+	<script type="text/javascript" charset="utf-8">
+		//handle incoming chat messages, pushed by App Engine
+		function onMessage(message) {
+			var current = $('textarea').val();
+			message && $('textarea').val(current + '\n' + message.data);
+		}
+	
+		//Initialize our little chat application
+		$(function() {
+			//Get a client token to use with the channel API
+			$.ajax('/chat',{
+				method:'GET',
+				dataType:'text',
+				success: function(token) {
+					console.log(token);
+					var channel = new goog.appengine.Channel(token);
+					var socket = channel.open();
+					
+					//Assign our handler function to the open socket
+					socket.onmessage = onMessage;
+				}
+			});
+			
+			//handle submitting chat message
+			function submitMessage() {
+				$.ajax('/chat', {
+					method:'POST',
+					dataType:'text',
+					data: {
+						message:$('input').val()
+					},
+					success:function(response) {
+						$('input').val('').focus();
+						console.log(response);
+					}
+				});
+			}
+			
+			//Attach event handlers
+			$('button').on('click', submitMessage);
+			$('input').keypress(function (e) {
+				if (e.which == 13) {
+					submitMessage();
+				}
+			});
+		});
+	</script>
+</head>
+
+<body>
+	<div id="container">
+		<header>
+			<div id="header">
+				<h1 class="section-heading">App Engine Chat</h1>
+			</div>
+		</header>
+		<section>
+			<div id="content">
+				<h2 class="section-heading">Chat via this web page, SMS, or XMPP (Google Talk).</h2>
+				
+				<h4>To chat via SMS, send a text message to (text STOP to unsubscribe):</h4>
+				<div class="contact">+1 612-294-8105</div>
+				
+				<h4>To chat via XMPP/Google Talk, send a message to (message STOP to unsubscribe):</h4>
+				<div class="contact">twiliosandbox@appspot.com</div>
+				
+				<!-- Chat inputs/output -->
+				<textarea readonly value="Awaiting messages..."></textarea>
+				<input placeholder="enter a message..."/>
+				<button class="button">Send Message</button>
+			</div>
+		</section>
+		<footer>
+			<p class="footer">
+				Source on <a href="https://github.com/kwhinnery/gae-chat">Github</a>.
+				Released under <a href="http://www.opensource.org/licenses/mit-license.html">MIT license</a>.
+			</p>
+		</footer>
+	</div>
+</body>
+</html>

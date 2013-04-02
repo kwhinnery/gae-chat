@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	
+	<!-- Handle incoming chat messages from the browser, and issue client IDs -->
+	<servlet>
+		<servlet-name>chat</servlet-name>
+		<servlet-class>com.twilio.ChatServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>chat</servlet-name>
+		<url-pattern>/chat</url-pattern>
+	</servlet-mapping>
+
+	<!-- Handle Incoming SMS messages -->
+	<servlet>
+		<servlet-name>sms</servlet-name>
+		<servlet-class>com.twilio.TwilioSmsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>sms</servlet-name>
+		<url-pattern>/sms</url-pattern>
+	</servlet-mapping>
+
+	<!-- Handle incoming XMPP messages -->
+	<servlet>
+		<servlet-name>xmpp</servlet-name>
+		<servlet-class>com.twilio.XMPPReceiverServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>xmpp</servlet-name>
+		<url-pattern>/_ah/xmpp/message/chat/</url-pattern>
+	</servlet-mapping>
+
+	<!-- Default App Engine configuration -->
+	<servlet>
+		<servlet-name>SystemServiceServlet</servlet-name>
+		<servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
+		<init-param>
+			<param-name>services</param-name>
+			<param-value/>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SystemServiceServlet</servlet-name>
+		<url-pattern>/_ah/spi/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- configure home page for the chat server -->
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+</web-app>
